@@ -1,0 +1,23 @@
+{
+  "name": "vuln-backend",
+  "version": "1.0.0",
+  "description": "backend for Fragile Forum website",
+  "license": "ISC",
+  "author": "Niilo Ikonen",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.13.0",
+    "sequelize": "^6.37.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

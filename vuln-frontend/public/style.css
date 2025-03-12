@@ -1,0 +1,11 @@
+#root {
+    margin: 0 auto;
+    text-align: center;
+    max-width:1280px;
+  }
+  
+  .card {
+    padding: 2em;
+    margin-bottom:10px;
+  }
+  
