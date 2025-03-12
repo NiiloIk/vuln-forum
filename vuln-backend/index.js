@@ -1,7 +1,7 @@
 const express = require('express')
 require('dotenv').config()
 
-console.log()
+
 const app = express()
 
 const postsRouter = require('./controllers/posts')
