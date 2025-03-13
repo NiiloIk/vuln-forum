@@ -1,15 +1,10 @@
 const express = require('express')
-require('dotenv').config()
-
-
 const app = express()
 
-const postsRouter = require('./controllers/posts')
 const middleware = require('./utils/middleware')
-
-// Connect to MySQL database
-const sequelize = require('./config/database')
-
+const usersRouter = require('./controllers/users')
+const postsRouter = require('./controllers/posts')
+const commentsRouter = require('./controllers/comments')
 
 // Middleware
 app.use(express.json())
@@ -18,21 +13,11 @@ app.use(middleware.requestLogger)
 
 // Endpoints
 app.use('/api/posts', postsRouter)
-
-app.get('/', (req, res) => {
-    res.send("Endpoints at /api/posts")
-})
-
-
+app.use('/api/users', usersRouter)
+app.use('/api/comments', commentsRouter)
 
 // Start the server
-const PORT = 3001
-
-sequelize.sync().then(() => {
-    console.log('Database synced')
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`)
-    })  
-}).catch(err => {
-    console.error('Database sync error:', err);
-});
+const PORT = 3002
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+})  
