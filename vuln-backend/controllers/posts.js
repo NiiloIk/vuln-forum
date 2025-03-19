@@ -13,11 +13,12 @@ const makeAQuery = async (req, res, queryString) => {
 }
 
 const getSinglePostQueryString = (id) => {
-  return `SELECT u.username AS post_creator, p.title, p.content, p.created_at AS post_created_at, p.modified_at AS post_modified_at, 
+  return `SELECT u.username AS post_creator, u.id AS user_id, p.title, p.content, p.created_at AS post_created_at, p.modified_at AS post_modified_at, 
     JSON_ARRAYAGG(
         JSON_OBJECT(
             'comment_id', c.id,
             'commenter', u2.username,
+            'commenter_id', u2.id,
             'comment', c.comment,
             'comment_created_at', c.created_at
         )
@@ -30,7 +31,7 @@ const getSinglePostQueryString = (id) => {
 }
 
 const getMultiplePostsQueryString = () => {
-  return `SELECT * FROM posts ORDER BY created_at DESC`
+  return `SELECT posts.id, user_id, title, content, created_at, modified_at, users.username FROM posts INNER JOIN users ON users.id = posts.user_id ORDER BY created_at DESC`
 }
 
 // Endpoints for posts
@@ -39,37 +40,43 @@ postsRouter.get('/', (req, res) => {
 })
 
 postsRouter.post('/', async (req, res) => {
-    const body = req.body
+  const user = req.user
 
-    if (!body.user_id || !body.title || !body.content) {
-        return res.status(400).json({ 
-          error: 'content missing' 
-        })
-    }
-    try {
-      await pool.execute(`INSERT INTO posts (user_id, title, content) VALUES(${body.user_id}, '${body.title}', '${body.content}');`)
-      makeAQuery(req, res, getMultiplePostsQueryString())
-    } catch (error) {
-      console.error("Database query failed:", error)
-      res.status(500).json({ message: "Error fetching posts" })
-    }
+  if (user === null) {
+    return res.status(401).json({ error: 'invalid token'})
+  }
+
+  const body = req.body
+
+  if (!body.title || !body.content) {
+    return res.status(400).json({
+      error: 'content missing'
+    })
+  }
+  try {
+    await pool.execute(`INSERT INTO posts (user_id, title, content) VALUES(${user.id}, '${body.title}', '${body.content}');`)
+    makeAQuery(req, res, getMultiplePostsQueryString())
+  } catch (error) {
+    console.error("Database query failed:", error)
+    res.status(500).json({ message: "Error fetching posts" })
+  }
 })
 
 postsRouter.get('/:id', (req, res) => {
-    const id = Number(req.params.id)
-    makeAQuery(req, res, getSinglePostQueryString(id))
+  const id = Number(req.params.id)
+  makeAQuery(req, res, getSinglePostQueryString(id))
 })
 
 
 postsRouter.delete('/:id', async (req, res) => {
-    const id = Number(req.params.id)
-    try {
-      await pool.execute(`DELETE FROM posts WHERE id=${id};`)
-      makeAQuery(req, res, getMultiplePostsQueryString())
-    } catch (error) {
-      console.error("Database query failed:", error)
-      res.status(500).json({ message: "Error fetching posts" })
-    }
+  const id = Number(req.params.id)
+  try {
+    await pool.execute(`DELETE FROM posts WHERE id=${id};`)
+    makeAQuery(req, res, getMultiplePostsQueryString())
+  } catch (error) {
+    console.error("Database query failed:", error)
+    res.status(500).json({ message: "Error fetching posts" })
+  }
 })
 
 postsRouter.post('/:id/comment', async (req, res) => {
@@ -77,14 +84,14 @@ postsRouter.post('/:id/comment', async (req, res) => {
   const post_id = Number(req.params.id)
 
   if (!body.user_id || !body.comment) {
-      return res.status(400).json({ 
-        error: 'content missing' 
-      })
+    return res.status(400).json({
+      error: 'content missing'
+    })
   }
 
   try {
     await pool.execute(`INSERT INTO comments (post_id, user_id, comment) VALUES (${post_id}, ${body.user_id}, "${body.comment}");`)
-    
+
     makeAQuery(req, res, getSinglePostQueryString(post_id))
   } catch (error) {
     console.error("Database query failed:", error)

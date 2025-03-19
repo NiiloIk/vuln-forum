@@ -42,7 +42,7 @@ usersRouter.post('/', async (req, res) => {
 usersRouter.get('/:id', (req, res) => {
     const id = Number(req.params.id)
 
-    makeAQuery(req, res, `SELECT * FROM posts WHERE posts.user_id = ${id} ORDER BY created_at;`)
+    makeAQuery(req, res, `SELECT posts.id, user_id, title, content, created_at, modified_at, users.username FROM posts INNER JOIN users ON users.id = posts.user_id WHERE posts.user_id = ${id} ORDER BY created_at DESC;`)
 })
 
 
