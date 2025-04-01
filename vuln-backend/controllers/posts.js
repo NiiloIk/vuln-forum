@@ -54,7 +54,9 @@ postsRouter.post('/', async (req, res) => {
     })
   }
   try {
-    await pool.execute(`INSERT INTO posts (user_id, title, content) VALUES(${user.id}, '${body.title}', '${body.content}');`)
+    const sql_command = `INSERT INTO posts (user_id, title, content) VALUES(${user.id}, '${body.title}', '${body.content}');`
+    console.log(sql_command)
+    await pool.execute(sql_command)
     makeAQuery(req, res, getMultiplePostsQueryString())
   } catch (error) {
     console.error("Database query failed:", error)
@@ -80,17 +82,24 @@ postsRouter.delete('/:id', async (req, res) => {
 })
 
 postsRouter.post('/:id/comment', async (req, res) => {
+  const user = req.user
+
+  if (user === null) {
+    return res.status(401).json({ error: 'invalid token'})
+  }
+
   const body = req.body
   const post_id = Number(req.params.id)
 
-  if (!body.user_id || !body.comment) {
+  if (!body.comment) {
     return res.status(400).json({
       error: 'content missing'
     })
   }
-
+  const sql_command =  `INSERT INTO comments (post_id, user_id, comment) VALUES (${post_id}, ${user.id}, '${body.comment}');`
+  console.log(sql_command)
   try {
-    await pool.execute(`INSERT INTO comments (post_id, user_id, comment) VALUES (${post_id}, ${body.user_id}, "${body.comment}");`)
+    await pool.execute(sql_command)
 
     makeAQuery(req, res, getSinglePostQueryString(post_id))
   } catch (error) {

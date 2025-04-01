@@ -3,6 +3,8 @@ const id = URLpath.split('/').pop()
 
 const API_URL = `http://localhost:3002/api/posts/${id}`
 
+const userToken = window.localStorage.getItem('loggedForumappUser')
+const token = userToken ? "Bearer " + userToken.toString() : null
 
 // Fetch and display posts
 async function loadPost() {
@@ -26,6 +28,7 @@ async function loadPost() {
     `
     
     const commentContainer = document.getElementById("comments-container")
+    commentContainer.innerHTML = ""
     if (comments[0]['comment']) {
         comments.forEach(comment => {
             const commentElement = document.createElement("div");
@@ -44,21 +47,19 @@ async function loadPost() {
     }
 }
 
-// Handle new post submission
+// Handle new comment submission
 document.getElementById("commentForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const comment = document.getElementById("comment").value;
-    const user_id = 1;
 
-    const newComment = { post_id: id, user_id, comment };
     await fetch(API_URL + "/comment", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newComment)
+        headers: { "Content-Type": "application/json", "authorization": token },
+        body: JSON.stringify({ comment })
     });
 
-    // Clear form & reload posts
+    // Clear form & reload
     e.target.reset();
     loadPost();
 });
