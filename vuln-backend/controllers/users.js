@@ -40,9 +40,9 @@ usersRouter.post('/', async (req, res) => {
 
 // This needs to return the posts of a certain users.
 usersRouter.get('/:id', (req, res) => {
-    const id = Number(req.params.id)
+    const id = req.params.id
 
-    makeAQuery(req, res, `SELECT posts.id, user_id, title, content, created_at, modified_at, users.username FROM posts INNER JOIN users ON users.id = posts.user_id WHERE posts.user_id = ${id} ORDER BY created_at DESC;`)
+    makeAQuery(req, res, `SELECT posts.id, user_id, title, content, created_at, modified_at, users.username FROM posts LEFT JOIN users ON users.id = posts.user_id WHERE posts.user_id = ${id} ORDER BY created_at DESC;`)
 })
 
 
