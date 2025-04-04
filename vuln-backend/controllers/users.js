@@ -13,10 +13,8 @@ const makeAQuery = async (req, res, queryString) => {
 }
 
 // Endpoints
-usersRouter.get('/', (req, res) => {
-  makeAQuery(req, res, "SELECT * FROM users")
-})
 
+// Register.
 usersRouter.post('/', async (req, res) => {
     const body = req.body
 
@@ -38,9 +36,13 @@ usersRouter.post('/', async (req, res) => {
     }
 })
 
-// This needs to return the posts of a certain users.
+// Return the posts of user.
 usersRouter.get('/:id', (req, res) => {
-    const id = req.params.id
+    const id = Number(req.params.id)
+
+    if (!id) {
+      res.status(500).json({ message: "Error fetching user posts."})
+    }
 
     makeAQuery(req, res, `SELECT posts.id, user_id, title, content, created_at, modified_at, users.username FROM posts LEFT JOIN users ON users.id = posts.user_id WHERE posts.user_id = ${id} ORDER BY created_at DESC;`)
 })
