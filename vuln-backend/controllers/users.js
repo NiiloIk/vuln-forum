@@ -15,7 +15,7 @@ const makeAQuery = async (req, res, queryString, values=[]) => {
   }
 }
 
-const allUsersQueryString = "SELECT username FROM users"
+// const allUsersQueryString = "SELECT username FROM users"
 
 // Endpoints
 usersRouter.post('/', async (req, res) => {
@@ -44,7 +44,11 @@ usersRouter.post('/', async (req, res) => {
 
 // Returns all posts made by a single user.
 usersRouter.get('/:id', (req, res) => {
-    const id = req.params.id
+    const id = Number(req.params.id)
+
+    if (!id) {
+      res.status(500).json({ message: "Error fetching user posts."})
+    }
 
     makeAQuery(req, res, 
       `SELECT posts.id, user_id, title, content, created_at, modified_at, users.username FROM posts LEFT JOIN users ON users.id = posts.user_id WHERE posts.user_id = ? ORDER BY created_at DESC;`,
