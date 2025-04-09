@@ -6,7 +6,7 @@ if (user) {
     loginElement.style.display = "none"
     
     const userElement = document.getElementById('navbar-user')
-    userElement.innerHTML = `Logged in as: ${user}`
+    userElement.innerText = `Logged in as: ${user}`
 
     const logoutElement = document.getElementById('navbar-logout')
     logoutElement.style.display = "block"

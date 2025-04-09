@@ -17,27 +17,64 @@ async function loadPost() {
 
     console.log(post)
 
-    const postContainer = document.getElementById("post-container");
-    postContainer.innerHTML = ""; // Clear old values
-    postContainer.innerHTML = `
-        <h1>${post.title}</h1>
-        <small>By <a href='/users/${post.user_id}'>${post.post_creator}</a> </small>
-        <p>${post.content}</p>
-        <p>${new Date(Date.parse(post.post_created_at)).toLocaleDateString()}</p>
-        <hr>
-    `
+    const postElement = document.getElementById("post-container");
+    postElement.innerHTML = ""; // Clear old values
+
+    // Create title for post
+    const titleElement = document.createElement("h1")
+    titleElement.innerText = post.title
+    postElement.appendChild(titleElement)
     
+    // Create user text
+    const userElement = document.createElement("small")
+    const userLinkElement = document.createElement("a")
+    userLinkElement.setAttribute("href", `/users/${encodeURIComponent(post.user_id)}`)
+    userLinkElement.innerText = post.post_creator
+    userElement.innerText = "By "
+    userElement.appendChild(userLinkElement)
+    postElement.appendChild(userElement)
+
+    // Create content text
+    const contentElement = document.createElement("p")
+    contentElement.innerText = post.content
+    postElement.appendChild(contentElement)
+
+    // Create date text
+    const dateElement = document.createElement("p")
+    dateElement.innerText = new Date(Date.parse(post.post_created_at)).toLocaleDateString()
+    postElement.appendChild(dateElement)
+
+    // Add hr line.
+    postElement.appendChild(document.createElement("hr"))
+
+
+    // Create comments
     const commentContainer = document.getElementById("comments-container")
     commentContainer.innerHTML = ""
+    
     if (comments[0]['comment']) {
         comments.forEach(comment => {
             const commentElement = document.createElement("div");
             commentElement.classList.add("comment");
-            commentElement.innerHTML = `
-                <h3>${comment.comment}</h3>
-                <small>By <a href='/users/${comment.commenter_id}'>${comment.commenter}</a> ${new Date(Date.parse(comment.comment_created_at)).toLocaleDateString()}</small>
-                <hr>
-            `;
+
+            // Create comment
+            const commentTextElement = document.createElement("h3")
+            commentTextElement.innerText = comment.comment
+            commentElement.appendChild(commentTextElement)
+
+            // Create user text with date time
+            const commenterInfoElement = document.createElement("small")
+            const commenterLinkElement = document.createElement("a")
+            commenterLinkElement.setAttribute("href", `/users/${encodeURIComponent(comment.commenter_id)}`)
+            commenterLinkElement.innerText = comment.commenter
+            commenterInfoElement.innerText = "By "
+            commenterInfoElement.appendChild(commenterLinkElement)
+            commenterInfoElement.append(` ${new Date(Date.parse(comment.comment_created_at)).toLocaleDateString()}`)
+            commentElement.appendChild(commenterInfoElement)
+
+            // hr element
+            commentElement.appendChild(document.createElement("hr"))
+
             commentContainer.appendChild(commentElement);
         });
     } else {

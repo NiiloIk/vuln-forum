@@ -7,11 +7,14 @@ loginRouter.post('/', async (req, res) => {
     const { username, password } = req.body
     let user
     try {
-        const [rows] = await pool.query(`SELECT * FROM users WHERE username='${username}'`)
+        const [rows] = await pool.query(
+            `SELECT * FROM users WHERE username=?`,
+            [username]
+        )
         user = rows[0]
     } catch (error) {
         console.error("Database query failed:", error)
-        res.status(500).json({ message: "Error fetching user" })
+        res.status(500).json({ message: "invalid username or password" })
     }
 
     const passwordCorrect =

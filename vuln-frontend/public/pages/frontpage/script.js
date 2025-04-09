@@ -17,22 +17,46 @@ async function loadPosts() {
     postsContainer.innerHTML = ""; // Clear old posts
 
     posts.forEach(post => {
-        const postElement = document.createElement("div");
-        postElement.classList.add("post");
+        const postElement = document.createElement("div")
+        postElement.classList.add("post")
 
-        let elementText = `
-            <h3><a href='/posts/${post.id}'>${post.title}</a></h3>
-            <p>${post.content}</p>
-            <small>By <a href='/users/${post.user_id}'>${post.username}</a></small>
-            <p>${new Date(Date.parse(post.created_at)).toLocaleDateString()}</p>
-        `
+        // Create title
+        const titleElement = document.createElement("h3")
+        const titleLinkElement = document.createElement("a")
+        titleLinkElement.setAttribute("href", `/posts/${encodeURIComponent(post.id)}`) 
+        titleLinkElement.innerText = post.title
+        titleElement.appendChild(titleLinkElement)
+        postElement.appendChild(titleElement)
+
+        // Create content text
+        const contentElement = document.createElement("p")
+        contentElement.innerText = post.content
+        postElement.appendChild(contentElement)
+
+        // Create user text
+        const userElement = document.createElement("small")
+        const userLinkElement = document.createElement("a")
+        userLinkElement.setAttribute("href", `/users/${encodeURIComponent(post.user_id)}`)
+        userLinkElement.innerText = post.username
+        userElement.innerText = "By "
+        userElement.appendChild(userLinkElement)
+        postElement.appendChild(userElement)
+        
+        // Create date text
+        const dateElement = document.createElement("p")
+        dateElement.innerText = new Date(Date.parse(post.created_at)).toLocaleDateString()
+        postElement.appendChild(dateElement)
+
+        // Create delete button
         if (loggedUser === post.username) {
-            elementText += `<button onclick=handleButtonClick(${post.id})>delete</button>`
-        } 
-        elementText += '<hr>'
+            const deleteButtonElement = document.createElement("button")
+            deleteButtonElement.addEventListener("click", () => handleButtonClick(post.id))
+            deleteButtonElement.innerText = "delete"
+            postElement.appendChild(deleteButtonElement)
+        }
 
-        postElement.innerHTML = elementText;
-        postsContainer.appendChild(postElement);
+        postElement.appendChild(document.createElement("hr"))
+        postsContainer.appendChild(postElement)
     });
 }
 
