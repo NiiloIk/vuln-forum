@@ -10,16 +10,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password }),
+        credentials: "include"
     })
-    const data = await response.json()
-    
+    const res_status = await response.status
+
     e.target.reset()
-    if (!data['token']) {
+    if (res_status !== 200) {
         loginError.style.display = "block"
     } else {
-        window.localStorage.setItem('loggedForumappUser', data.token)
-        window.localStorage.setItem('forumUsername', data.username)
         window.location.href = '/' // Go to front page
     }
 })

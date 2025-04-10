@@ -1,14 +1,27 @@
 const API_URL = 'http://localhost:3002/api/posts';
 
 
-const loggedUser = window.localStorage.getItem('forumUsername')
-const userToken = window.localStorage.getItem('loggedForumappUser')
-const token = userToken ? "Bearer " + userToken.toString() : null
+function getUsername() {
+    let name = "username" + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+}
+const loggedUser = getUsername()
 
 
 // Fetch and display posts
 async function loadPosts() {
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, { credentials: 'include' });
     const posts = await response.json();
 
     console.log(posts)
@@ -65,7 +78,8 @@ async function handleButtonClick (id) {
     const DEL_API_URL = API_URL + `/${id}`
     await fetch(DEL_API_URL, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json", 'authorization': token }
+        headers: { "Content-Type": "application/json" },
+        credentials: "include"
     });
     // Reload posts
     loadPosts();
@@ -81,8 +95,9 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
 
     await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json", 'authorization': token },
-        body: JSON.stringify(newPost)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newPost),
+        credentials: "include"
     });
 
     // Clear form & reload posts

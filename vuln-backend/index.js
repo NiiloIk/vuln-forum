@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const cookieParser = require('cookie-parser')
 const app = express()
 
 
@@ -9,8 +10,13 @@ const postsRouter = require('./controllers/posts')
 const loginRouter = require('./controllers/login')
 
 // Middleware
-app.use(cors())
+app.use(cookieParser())
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}))
 app.use(express.json())
+app.use(middleware.limiter)
 app.use(middleware.requestLogger)
 app.use(middleware.tokenExtractor)
 app.use(middleware.userExtractor)

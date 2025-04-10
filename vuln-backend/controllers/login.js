@@ -33,7 +33,31 @@ loginRouter.post('/', async (req, res) => {
 
     const token = jwt.sign(userForToken, process.env.SECRET)
 
-    res.status(200).send({ token, username: user.username })
+    res.cookie('userToken', token, { 
+        secure: false,
+        sameSite: 'lax',
+        httpOnly: true
+    })
+
+    res.cookie('username', user.username, {
+        secure: false,
+        sameSite: 'lax',
+    })
+
+    res.status(200).send()
+})
+
+loginRouter.get('/logout', async (req, res) => {
+    res.clearCookie('username', {
+        secure: false,
+        sameSite: 'lax',
+        httpOnly: true
+    })
+    res.clearCookie('userToken', {
+        secure: false,
+        sameSite: 'lax',
+    })
+    res.status(200).send()
 })
 
 module.exports = loginRouter

@@ -1,5 +1,5 @@
 import requests
-URL = "http://localhost:3002/api/posts"
+URL = "http://localhost:3000"
 
 
 def send_request():

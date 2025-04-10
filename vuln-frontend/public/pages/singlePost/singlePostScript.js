@@ -9,7 +9,7 @@ const token = userToken ? "Bearer " + userToken.toString() : null
 // Fetch and display posts
 async function loadPost() {
 
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, { credentials: "include" });
     const postWithComments = await response.json();
 
     // Seperate comments from posts using deconstructing
@@ -92,8 +92,9 @@ document.getElementById("commentForm").addEventListener("submit", async (e) => {
 
     await fetch(API_URL + "/comment", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "authorization": token },
-        body: JSON.stringify({ comment })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ comment }),
+        credentials: "include"
     });
 
     // Clear form & reload

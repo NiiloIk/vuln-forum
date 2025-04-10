@@ -73,9 +73,24 @@ postsRouter.get('/:id', (req, res) => {
 // TODO: This does not check which user tries to delete a post.
 postsRouter.delete('/:id', async (req, res) => {
   const id = Number(req.params.id)
+
+  const user = req.user
+  if (user === null) {
+    return res.status(401).json({ error: 'invalid token' })
+  }
+
   try {
-    await pool.execute(`
-      DELETE FROM posts WHERE id=?;`,
+    const post_user = await pool.query(
+      `SELECT users.id FROM posts LEFT JOIN users ON users.id = posts.user_id WHERE posts.id = ?;`,
+      [id]
+    )
+    const post_user_ID = post_user[0][0]['id']
+    if (post_user_ID !== user.id) {
+      res.status(403).json({ message: "Unauthorized."})
+    }
+    
+    await pool.execute(
+      `DELETE FROM posts WHERE id=?;`,
       [id]
     )
     makeAQuery(req, res, multiplePostsQueryString)

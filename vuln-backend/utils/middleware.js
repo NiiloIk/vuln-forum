@@ -1,11 +1,18 @@
 const logger = require('./logger')
 const jwt = require('jsonwebtoken')
 const pool = require('../config/db')
+const rateLimit = require('express-rate-limit')
+
+// Limit each IP to 100 requests per 10 minutes
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 100, 
+    message: "Too many requests from this IP, please try again after 15 minutes",
+})
 
 const tokenExtractor = (request, response, next) => {
-    const authorization = request.get('authorization')
-    if (authorization && authorization.startsWith('Bearer ')) {
-        request.token = authorization.replace('Bearer ', '')
+    if (request.cookies && request.cookies['userToken']) {
+        request.token = request.cookies['userToken']
     } else {
         request.token = null
     }
@@ -50,4 +57,5 @@ module.exports = {
     tokenExtractor,
     userExtractor,
     requestLogger,
+    limiter
 }

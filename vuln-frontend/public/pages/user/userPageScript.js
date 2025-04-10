@@ -5,7 +5,7 @@ const API_URL = `http://localhost:3002/api/users/${id}`
 
 // Fetch and display posts
 async function loadPosts() {
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, { credentials: "include" });
     const posts = await response.json();
     
     const headerElem = document.getElementById('usernameHeader')

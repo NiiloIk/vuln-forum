@@ -15,7 +15,7 @@ def brute_force_password():
       data = {'username': username, 'password': password}
       res = requests.post(url, json=data)
       time.sleep(0.01)
-      print(password)
+      print(res.status_code, password)
       if res.status_code == 200:
         return password
     

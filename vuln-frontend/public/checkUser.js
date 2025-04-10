@@ -1,4 +1,4 @@
-const user = window.localStorage.getItem('forumUsername')
+const user = getUsername()
 
 if (user) {
     // If user is logged in transform loginElement to logout element.
@@ -13,7 +13,6 @@ if (user) {
 }
 
 document.getElementById('navbar-logout').addEventListener('click', async (e) => {
-    window.localStorage.removeItem('loggedForumappUser')
-    window.localStorage.removeItem('forumUsername')
+    await fetch('http://localhost:3002/api/login/logout', { credentials: "include" })
     window.location.href = '/' // Go to front page
 })
