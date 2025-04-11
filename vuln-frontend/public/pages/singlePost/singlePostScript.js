@@ -22,10 +22,18 @@ function getUsername() {
     return "";
 }
 
+async function getCSRFToken() {
+    const res = await fetch('http://localhost:3002/api/csrf-token', {
+        credentials: 'include'
+    });
+    const data = await res.json();
+    return data.csrfToken;
+}
+
 // Fetch and display posts
 async function loadPost() {
 
-    const response = await fetch(API_URL, { credentials: "include" });
+    const response = await fetch(API_URL);
     const postWithComments = await response.json();
 
     // Seperate comments from posts using deconstructing
@@ -105,10 +113,14 @@ document.getElementById("commentForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const comment = document.getElementById("comment").value;
+    const csrfToken = await getCSRFToken()
 
     await fetch(API_URL + "/comment", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken
+        },
         body: JSON.stringify({ comment }),
         credentials: "include"
     });

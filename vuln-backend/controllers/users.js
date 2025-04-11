@@ -1,5 +1,6 @@
 const usersRouter = require('express').Router()
 const pool = require('../config/db')
+const { verifyCSRFToken } = require('../utils/middleware')
 
 // Helper function
 const makeAQuery = async (req, res, queryString, values=[]) => {
@@ -58,7 +59,7 @@ usersRouter.get('/:id', (req, res) => {
 })
 
 // Delete a user.
-usersRouter.post('/:id/delete', async (req, res) => {
+usersRouter.post('/:id/delete', verifyCSRFToken, async (req, res) => {
     const id = Number(req.params.id)
     const user = req.user
     if (user === null) {

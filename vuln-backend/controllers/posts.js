@@ -1,5 +1,7 @@
 const postsRouter = require('express').Router()
+const { verify } = require('crypto')
 const pool = require('../config/db')
+const { verifyCSRFToken } = require('../utils/middleware')
 
 // Helper function
 const makeAQuery = async (req, res, queryString, values=[]) => {
@@ -38,7 +40,7 @@ postsRouter.get('/', (req, res) => {
   makeAQuery(req, res, multiplePostsQueryString)
 })
 
-postsRouter.post('/', async (req, res) => {
+postsRouter.post('/', verifyCSRFToken, async (req, res) => {
   const user = req.user
   if (user === null) {
     return res.status(401).json({ error: 'invalid token' })
@@ -72,7 +74,7 @@ postsRouter.get('/:id', (req, res) => {
 })
 
 // Deletes a post
-postsRouter.post('/:id/delete', async (req, res) => {
+postsRouter.post('/:id/delete', verifyCSRFToken, async (req, res) => {
   const id = Number(req.params.id)
 
   const user = req.user
@@ -82,10 +84,10 @@ postsRouter.post('/:id/delete', async (req, res) => {
 
   try {
     const post_user = await pool.query(
-      `SELECT users.id FROM posts LEFT JOIN users ON users.id = posts.user_id WHERE posts.id = ?;`,
+      `SELECT user_id FROM posts WHERE posts.id = ?;`,
       [id]
     )
-    const post_user_ID = post_user[0][0]['id']
+    const post_user_ID = post_user[0][0]['user_id']
     if (post_user_ID !== user.id) {
       res.status(403).json({ message: "Unauthorized."})
     } else {
@@ -101,7 +103,7 @@ postsRouter.post('/:id/delete', async (req, res) => {
   }
 })
 
-postsRouter.post('/:id/comment', async (req, res) => {
+postsRouter.post('/:id/comment', verifyCSRFToken, async (req, res) => {
   const user = req.user
 
   if (user === null) {
@@ -129,16 +131,34 @@ postsRouter.post('/:id/comment', async (req, res) => {
   }
 })
 
-// TODO: Doesn't check user who deletes a comment.
-postsRouter.delete('/:id/comment/:comment_id', async (req, res) => {
+// Deletes a comment
+postsRouter.delete('/:id/comment/:comment_id', verifyCSRFToken, async (req, res) => {
   const post_id = Number(req.params.id)
   const comment_id = Number(req.params.comment_id)
+  const user = req.user
+
+  if (user === null) {
+    return res.status(401).json({ error: 'invalid token' })
+  }
+
   try {
-    await pool.execute(
-      `DELETE FROM comments WHERE id=?;`,
-      [comment_id]
+    const comment_user = await pool.query(
+      `SELECT user_id FROM comments WHERE id = ?;`,
+      [id]
     )
-    makeAQuery(req, res, singlePostQueryString, [post_id])
+
+    const comment_user_ID = comment_user[0][0]['user_id']
+    if (comment_user_ID !== user.id) {
+      res.status(403).json({ message: "Unauthorized."})
+    } else {
+      await pool.execute(
+        `DELETE FROM comments WHERE id=?;`,
+        [comment_id]
+      )
+      makeAQuery(req, res, singlePostQueryString, [post_id])
+    }
+    
+
   } catch (error) {
     console.error("Database query failed:", error)
     res.status(500).json({ message: "Error fetching comments" })

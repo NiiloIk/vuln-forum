@@ -10,6 +10,22 @@ const limiter = rateLimit({
     message: "Too many requests from this IP, please try again after 15 minutes",
 })
 
+const generateCSRFToken = (req, res, next) => {
+    // Create a new token if one does not exist
+    if (!req.session.csrfToken) {
+        req.session.csrfToken = crypto.randomUUID()
+    }
+    next()
+}
+
+const verifyCSRFToken = (req, res, next) => {
+    const token = req.headers['x-csrf-token']
+    if (token !== req.session.csrfToken) {
+        return res.status(403).send('invalid CSRF token')
+    }
+    next()
+}
+
 const tokenExtractor = (request, response, next) => {
     if (request.cookies && request.cookies['userToken']) {
         request.token = request.cookies['userToken']
@@ -54,6 +70,8 @@ const requestLogger = (request, response, next) => {
 }
 
 module.exports = {
+    generateCSRFToken,
+    verifyCSRFToken,
     tokenExtractor,
     userExtractor,
     requestLogger,

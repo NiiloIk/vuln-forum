@@ -3,6 +3,14 @@ const id = URLpath.split('/').pop()
 
 const API_URL = `http://localhost:3002/api/users/${id}`
 
+async function getCSRFToken() {
+    const res = await fetch('http://localhost:3002/api/csrf-token', {
+        credentials: 'include'
+    });
+    const data = await res.json();
+    return data.csrfToken;
+}
+
 function getUsername() {
     let name = "username" + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
@@ -34,9 +42,13 @@ async function loadPosts() {
     // Delete button
     if (loggedUser === posts[0].username) {
         const deleteButtonElement = document.createElement("button")
+        const csrfToken = await getCSRFToken()
         deleteButtonElement.addEventListener("click", async () => {
             const res = await fetch(API_URL + "/delete", {
                 method: "POST",
+                headers: {
+                    "X-CSRF-Token": csrfToken
+                },
                 credentials: "include"
             })
 

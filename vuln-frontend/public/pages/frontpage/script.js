@@ -18,10 +18,17 @@ function getUsername() {
 }
 const loggedUser = getUsername()
 
+async function getCSRFToken() {
+    const res = await fetch('http://localhost:3002/api/csrf-token', {
+        credentials: 'include'
+    });
+    const data = await res.json();
+    return data.csrfToken;
+}
 
 // Fetch and display posts
 async function loadPosts() {
-    const response = await fetch(API_URL, { credentials: 'include' });
+    const response = await fetch(API_URL);
     const posts = await response.json();
 
     console.log(posts)
@@ -75,10 +82,14 @@ async function loadPosts() {
 
 // Handle deletion of post
 async function handleButtonClick (id) {
+    const csrfToken = await getCSRFToken()
     const DEL_API_URL = API_URL + `/${id}/delete`
     await fetch(DEL_API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken
+        },
         credentials: "include"
     });
     // Reload posts
@@ -88,6 +99,7 @@ async function handleButtonClick (id) {
 // Handle new post submission
 document.getElementById("postForm").addEventListener("submit", async (e) => {
     e.preventDefault();
+    const csrfToken = await getCSRFToken()
 
     const title = document.getElementById("title").value;
     const content = document.getElementById("content").value;
@@ -95,7 +107,10 @@ document.getElementById("postForm").addEventListener("submit", async (e) => {
 
     await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken
+        },
         body: JSON.stringify(newPost),
         credentials: "include"
     });
