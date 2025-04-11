@@ -83,9 +83,9 @@ async function loadPosts() {
 // Handle deletion of post
 async function handleButtonClick (id) {
     const csrfToken = await getCSRFToken()
-    const DEL_API_URL = API_URL + `/${id}/delete`
+    const DEL_API_URL = API_URL + `/${id}`
     await fetch(DEL_API_URL, {
-        method: "POST",
+        method: "DELETE",
         headers: { 
             "Content-Type": "application/json",
             "X-CSRF-Token": csrfToken

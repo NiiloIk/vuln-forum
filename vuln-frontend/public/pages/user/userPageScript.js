@@ -39,13 +39,13 @@ async function loadPosts() {
     const postsCountElem = document.getElementById('postsCount')
     postsCountElem.innerText = `Amount of posts: ${posts.length}`
 
-    // Delete button
+    // User delete button
     if (loggedUser === posts[0].username) {
         const deleteButtonElement = document.createElement("button")
         const csrfToken = await getCSRFToken()
         deleteButtonElement.addEventListener("click", async () => {
-            const res = await fetch(API_URL + "/delete", {
-                method: "POST",
+            const res = await fetch(API_URL, {
+                method: "DELETE",
                 headers: {
                     "X-CSRF-Token": csrfToken
                 },

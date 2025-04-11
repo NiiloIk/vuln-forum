@@ -59,7 +59,7 @@ usersRouter.get('/:id', (req, res) => {
 })
 
 // Delete a user.
-usersRouter.post('/:id/delete', verifyCSRFToken, async (req, res) => {
+usersRouter.delete('/:id', verifyCSRFToken, async (req, res) => {
     const id = Number(req.params.id)
     const user = req.user
     if (user === null) {
