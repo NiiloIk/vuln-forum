@@ -6,6 +6,22 @@ const API_URL = `http://localhost:3002/api/posts/${id}`
 const userToken = window.localStorage.getItem('loggedForumappUser')
 const token = userToken ? "Bearer " + userToken.toString() : null
 
+function getUsername() {
+    let name = "username" + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+}
+
 // Fetch and display posts
 async function loadPost() {
 

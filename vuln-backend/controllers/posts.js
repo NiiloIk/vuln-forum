@@ -45,6 +45,7 @@ postsRouter.post('/', async (req, res) => {
   }
 
   const body = req.body
+  console.log(body)
   if (!body.title || !body.content) {
     return res.status(400).json({
       error: 'content missing'
@@ -70,8 +71,8 @@ postsRouter.get('/:id', (req, res) => {
   makeAQuery(req, res, singlePostQueryString, [id])
 })
 
-// TODO: This does not check which user tries to delete a post.
-postsRouter.delete('/:id', async (req, res) => {
+// Deletes a post
+postsRouter.post('/:id/delete', async (req, res) => {
   const id = Number(req.params.id)
 
   const user = req.user
@@ -87,13 +88,13 @@ postsRouter.delete('/:id', async (req, res) => {
     const post_user_ID = post_user[0][0]['id']
     if (post_user_ID !== user.id) {
       res.status(403).json({ message: "Unauthorized."})
+    } else {
+      await pool.execute(
+        `DELETE FROM posts WHERE id=?;`,
+        [id]
+      )
+      makeAQuery(req, res, multiplePostsQueryString)
     }
-    
-    await pool.execute(
-      `DELETE FROM posts WHERE id=?;`,
-      [id]
-    )
-    makeAQuery(req, res, multiplePostsQueryString)
   } catch (error) {
     console.error("Database query failed:", error)
     res.status(500).json({ message: "Error fetching posts" })

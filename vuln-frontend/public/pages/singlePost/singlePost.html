@@ -27,12 +27,12 @@
           <a class="nav-link" href="/">Frontpage<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/login">Login<span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="/login" id="navbar-login">Login<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/register">Register<span class="sr-only">(current)</span></a>
+          <span class="navbar-text" id="navbar-user"></span>
         </li>
-        <li class="nav-item"><a class="nav-link" id="user" href="/logout"></a></li>
+        <li class="nav-item"><a class="nav-link" id="navbar-logout" style="display:none;" href="/">Logout</a></li>
       </ul>
     </div>
   </nav>
@@ -57,6 +57,7 @@
     
   </div>
   <script type="text/javascript" src="/pages/singlePost/singlePostScript.js"></script>
+  <script src="/checkUser.js"></script>
 </body>
 
 </html>

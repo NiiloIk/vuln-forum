@@ -18,6 +18,7 @@ const makeAQuery = async (req, res, queryString, values=[]) => {
 // const allUsersQueryString = "SELECT username FROM users"
 
 // Endpoints
+// Create a new user
 usersRouter.post('/', async (req, res) => {
     const body = req.body
 
@@ -35,10 +36,10 @@ usersRouter.post('/', async (req, res) => {
         `INSERT INTO users (role, email, password, username) VALUES (?, ?, ?, ?);`,
         [role, body.email, body.password, body.username]
       )
-      res.status(204)
+      res.status(204).send()
     } catch (error) {
       console.error("Database query failed:", error)
-      res.status(500).json({ message: "Error fetching users" })
+      res.status(500).json({ message: "User creation failed" })
     }
 })
 
@@ -56,15 +57,24 @@ usersRouter.get('/:id', (req, res) => {
     )
 })
 
-
-usersRouter.delete('/:id', async (req, res) => {
+// Delete a user.
+usersRouter.post('/:id/delete', async (req, res) => {
     const id = Number(req.params.id)
+    const user = req.user
+    if (user === null) {
+      return res.status(401).json({ error: 'invalid token' })
+    }
+
     try {
-      await pool.execute(
-        `DELETE FROM users WHERE id=?;`,
-        [id]
-      )
-      res.status(204)
+      if (id !== user.id) {
+        res.status(403).json({ message: "Unauthorized."}).send()
+      } else {
+        await pool.execute(
+          `DELETE FROM users WHERE id=?;`,
+          [id]
+        )
+        res.status(204).send()
+      }
     } catch (error) {
       console.error("Database query failed:", error)
       res.status(500).json({ message: "Error deleting user" })

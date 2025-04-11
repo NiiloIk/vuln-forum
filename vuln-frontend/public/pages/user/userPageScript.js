@@ -3,6 +3,23 @@ const id = URLpath.split('/').pop()
 
 const API_URL = `http://localhost:3002/api/users/${id}`
 
+function getUsername() {
+    let name = "username" + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+}
+const loggedUser = getUsername()
+
 // Fetch and display posts
 async function loadPosts() {
     const response = await fetch(API_URL, { credentials: "include" });
@@ -13,6 +30,25 @@ async function loadPosts() {
 
     const postsCountElem = document.getElementById('postsCount')
     postsCountElem.innerText = `Amount of posts: ${posts.length}`
+
+    // Delete button
+    if (loggedUser === posts[0].username) {
+        const deleteButtonElement = document.createElement("button")
+        deleteButtonElement.addEventListener("click", async () => {
+            const res = await fetch(API_URL + "/delete", {
+                method: "POST",
+                credentials: "include"
+            })
+
+            if (res.status === 204) {
+                await fetch("http://localhost:3002/api/login/logout", { credentials: "include" })
+                window.location.href = "/"
+            }
+        })
+        deleteButtonElement.innerText = "Delete account"
+        postsCountElem.appendChild(deleteButtonElement)
+    }
+
 
     const postsContainer = document.getElementById("posts-container");
     postsContainer.innerHTML = ""; // Clear old posts

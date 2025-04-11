@@ -27,12 +27,12 @@
           <a class="nav-link" href="/">Frontpage<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/login">Login<span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="/login" id="navbar-login">Login<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/register">Register<span class="sr-only">(current)</span></a>
+          <span class="navbar-text" id="navbar-user"></span>
         </li>
-        <li class="nav-item"><a class="nav-link" id="user" href="/logout"></a></li>
+        <li class="nav-item"><a class="nav-link" id="navbar-logout" style="display:none;" href="/">Logout</a></li>
       </ul>
     </div>
   </nav>
@@ -40,8 +40,9 @@
   <div id="root">
     <h1>Fragile Forum</h1>
     <div id="login-error" class="alert alert-danger" role="alert" style="display:none">
-        Error logging in.
+        Error
     </div>
+    <p id="user-creation-success" style="display:none">User creation success</p>
     <h2>Login</h2>
     <form id="loginForm">
       <div class="form-group">
@@ -58,7 +59,7 @@
     <p> Or </p>
     
     <h2>Register</h2>
-    <form id="registerFormForm">
+    <form id="registerForm">
       <div class="form-group">
         <label for="register-username">Username</label>
         <input type="text" class="form-control" id="register-username" required>
@@ -69,7 +70,7 @@
       </div>
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" class="form-control" id="email" required>
+        <input type="email" class="form-control" id="register-email" required>
       </div>
       <button type="submit" class="btn btn-primary">Register</button>
     </form>

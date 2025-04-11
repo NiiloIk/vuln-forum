@@ -75,9 +75,9 @@ async function loadPosts() {
 
 // Handle deletion of post
 async function handleButtonClick (id) {
-    const DEL_API_URL = API_URL + `/${id}`
+    const DEL_API_URL = API_URL + `/${id}/delete`
     await fetch(DEL_API_URL, {
-        method: "DELETE",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include"
     });
